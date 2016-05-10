@@ -30,13 +30,16 @@ import org.apache.spark.rdd.RDD
 
 def statsWithMissing(rdd: RDD[Array[Double]]): Array[NAStatCounter] = {
   val nastats = rdd.mapPartitions((iter: Iterator[Array[Double]]) => {
-    val nas: Array[NAStatCounter] = iter.next().map(d => NAStatCounter(d))
-    iter.foreach(arr => {
-      nas.zip(arr).foreach { case (n, d) => n.add(d)}
-    })
-    Iterator(nas)
+    if (iter.nonEmpty) {
+      val nas: Array[NAStatCounter] = iter.next().map(d => NAStatCounter(d))
+      iter.foreach(arr => {
+        nas.zip(arr).foreach { case (n, d) => n.add(d) }
+      })
+      Iterator(nas)
+    } else {
+      Iterator.empty
+    }
   })
-  //Iterator.empty[[Array[Double]]]
 
   nastats.reduce((n1, n2) => {
     n1.zip(n2).map { case (a, b) => a.merge(b)}
