@@ -39,3 +39,12 @@ val matchCountsSeq = matchCountsSeq.toSeq
 
 matchCountsSeq.sortBy(row => row._2).reverse.foreach(println)
 
+import java.lang.Double.isNaN
+parsed.map(md => md.scores(0)).filter(!isNaN(_)).stats
+
+//Same thing as above using straight Scala for each column in the
+// array of parsed csv data.
+val stats = (0 until 9).map(i =>
+  parsed.map(md =>
+    md.scores(i)
+  ).filter(!isNaN(_)).stats())
